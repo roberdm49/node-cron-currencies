@@ -87,13 +87,37 @@ const getStructuredCurrencies = (currenciesData: CurrencyData[]): ApiExpectedCur
   return structuredCurrencies
 }
 
+const sendCurrencies =
+
 const job = new CronJob('*/10 * * * * *', async () => {
   try {
+    /*
     const currenciesData = await getCurrenciesData()
     console.log(currenciesData)
     const structuredCurrencies = getStructuredCurrencies(currenciesData)
     console.log(structuredCurrencies)
-    // const sentCurrencies = await sendCurrencies()
+    */
+    const payload = [
+      {
+        name: 'Euro',
+        isoCode: 'EUR',
+        isoNum: '978',
+        valueInUsd: 0.8603696682464455
+      },
+      {
+        name: 'Real Brasileño',
+        isoCode: 'BRL',
+        isoNum: '986',
+        valueInUsd: 0.1591563981042654
+      },
+      {
+        name: 'Pesos argentinos',
+        isoCode: 'ARS',
+        isoNum: '032',
+        valueInUsd: 0.0009478672985781991
+      }
+    ]
+    const sentCurrencies = await sendCurrencies(payload)
   } catch (error) {
     console.log(error)
   }
