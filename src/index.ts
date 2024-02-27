@@ -87,9 +87,15 @@ const getStructuredCurrencies = (currenciesData: CurrencyData[]): ApiExpectedCur
   return structuredCurrencies
 }
 
-const sendCurrencies =
+const sendCurrencies = async (payload: ApiExpectedCurrencyStructure[]): Promise<AxiosResponse> => {
+  return await axios.post(GlobalEnv.INTERNAL_CURRENCY_API_URL, payload, {
+    headers: {
+      Authorization: `Bearer ${GlobalEnv.CRON_SECRET}`
+    }
+  })
+}
 
-const job = new CronJob('*/10 * * * * *', async () => {
+const executeCurrencyTask = async (): Promise<void> => {
   try {
     /*
     const currenciesData = await getCurrenciesData()
@@ -118,9 +124,17 @@ const job = new CronJob('*/10 * * * * *', async () => {
       }
     ]
     const sentCurrencies = await sendCurrencies(payload)
+    console.log({ sentCurrencies })
   } catch (error) {
     console.log(error)
   }
+}
+
+const job = new CronJob('*/10 * * * * *', async () => {
+  const newDate = new Date()
+  console.log(`Job @ ${newDate.toString()}`)
+  // await executeCurrencyTask()
 })
 
 job.start()
+executeCurrencyTask().then(res => console.log(res)).catch(error => console.log(error))
