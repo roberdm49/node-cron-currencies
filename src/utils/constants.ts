@@ -7,15 +7,15 @@ export const GlobalEnv = {
   EXTERNAL_CURRENCY_API_BASE_URL: String(process.env.EXTERNAL_CURRENCY_API_BASE_URL)
 } as const
 
-export const CURRENCY_PATHS = {
+export const CURRENCY_PATHS: { [key: string]: string } = {
   USD: 'dolares/blue',
   EUR: 'cotizaciones/eur',
   BRL: 'cotizaciones/brl'
 } as const
 
-export const ISO_NUMS = {
+export const ISO_NUMS: { [key: string]: string } = {
   USD: '840',
   EUR: '978',
   BRL: '986',
   ARS: '032'
-}
+} as const

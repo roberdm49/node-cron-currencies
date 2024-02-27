@@ -21,70 +21,77 @@ interface ApiExpectedCurrencyStructure {
   valueInUsd: number
 }
 
-const getCurrenciesMap = async (): Promise<Map<string, CurrencyData>> => {
-  const currencyMap = new Map<string, CurrencyData>()
+const getCurrenciesData = async (): Promise<CurrencyData[]> => {
+  const currencyPromises = []
 
-  const [usdResponse, eurResponse, brlResponse]: Array<AxiosResponse<CurrencyData>> = await Promise.all([
-    axios.get<CurrencyData>(`${GlobalEnv.EXTERNAL_CURRENCY_API_BASE_URL}/${CURRENCY_PATHS.USD}`),
-    axios.get<CurrencyData>(`${GlobalEnv.EXTERNAL_CURRENCY_API_BASE_URL}/${CURRENCY_PATHS.EUR}`),
-    axios.get<CurrencyData>(`${GlobalEnv.EXTERNAL_CURRENCY_API_BASE_URL}/${CURRENCY_PATHS.BRL}`)
-  ])
-
-  currencyMap.set('usd', usdResponse.data)
-  currencyMap.set('eur', eurResponse.data)
-  currencyMap.set('brl', brlResponse.data)
-
-  return currencyMap
-}
-
-const getStructuredCurrencies = (currenciesMap: Map<string, CurrencyData>): ApiExpectedCurrencyStructure[] => {
-  const usdData = currenciesMap.get('usd')
-  const eurData = currenciesMap.get('eur')
-  const brlData = currenciesMap.get('brl')
-
-  if (!usdData || !eurData || !brlData) {
-    throw new Error('Some currencies are not availables!')
+  for (const currencyPath of Object.values(CURRENCY_PATHS)) {
+    currencyPromises.push(
+      axios.get<CurrencyData>(`${GlobalEnv.EXTERNAL_CURRENCY_API_BASE_URL}/${currencyPath}`)
+    )
   }
 
-  const referenceUsdValue = new Big(usdData.compra)
+  const currencyResolvedPromises: Array<AxiosResponse<CurrencyData>> = await Promise.all(currencyPromises)
+  const currenciesData = currencyResolvedPromises.map(response => response.data)
 
-  const referenceArsValue = new Big(1)
-  const referenceEurValue = new Big(eurData.compra)
-  const referenceBrlValue = new Big(brlData.compra)
+  if (currencyResolvedPromises.length !== Object.keys(CURRENCY_PATHS).length) {
+    throw new Error(`The number of promises is different than the expected. Should be ${Object.keys(CURRENCY_PATHS).length} promises and there is ${currencyResolvedPromises.length} of them`)
+  }
 
-  // This is the only currency which is different to the rest!
-  // Because the currencies have the ARS as reference, but
-  // the reference should be the USD
+  return currenciesData
+}
+
+const getStructuredCurrencies = (currenciesData: CurrencyData[]): ApiExpectedCurrencyStructure[] => {
+  let usdReferenceValue = null
+  const rawCurrencies = []
+  const structuredCurrencies = []
+
+  for (const currency of currenciesData) {
+    const isoCode = currency.moneda
+
+    if (isoCode === 'USD') {
+      usdReferenceValue = new Big(currency.compra)
+    } else {
+      rawCurrencies.push(currency)
+    }
+  }
+
+  if (!usdReferenceValue) {
+    throw new Error('Main currency reference (USD) is missing!')
+  }
+
+  for (const rawCurrency of rawCurrencies) {
+    const currentCurrencyValue = new Big(rawCurrency.compra)
+    const normalizedCurrentCurrencyValue = currentCurrencyValue.div(usdReferenceValue).toNumber()
+
+    const currency: ApiExpectedCurrencyStructure = {
+      name: rawCurrency.nombre,
+      isoCode: rawCurrency.moneda,
+      isoNum: ISO_NUMS[rawCurrency.moneda],
+      valueInUsd: normalizedCurrentCurrencyValue
+    }
+
+    structuredCurrencies.push(currency)
+  }
+
+  // particular case, has to be done manually
+  const arsCurrencyValue = new Big(1)
+  const normalizedArsCurrencyValue = arsCurrencyValue.div(usdReferenceValue).toNumber()
   const ars: ApiExpectedCurrencyStructure = {
     name: 'Pesos argentinos',
     isoCode: 'ARS',
     isoNum: ISO_NUMS.ARS,
-    valueInUsd: referenceArsValue.div(referenceUsdValue).toNumber()
+    valueInUsd: normalizedArsCurrencyValue
   }
 
-  const eur: ApiExpectedCurrencyStructure = {
-    name: eurData.nombre,
-    isoCode: eurData.moneda,
-    isoNum: ISO_NUMS.EUR,
-    valueInUsd: referenceEurValue.div(referenceUsdValue).toNumber()
-  }
-
-  const brl: ApiExpectedCurrencyStructure = {
-    name: brlData.nombre,
-    isoCode: brlData.moneda,
-    isoNum: ISO_NUMS.BRL,
-    valueInUsd: referenceBrlValue.div(referenceUsdValue).toNumber()
-  }
-
-  const structuredCurrencies = [ars, eur, brl]
+  structuredCurrencies.push(ars)
   return structuredCurrencies
 }
 
 const job = new CronJob('*/10 * * * * *', async () => {
   try {
-    const currenciesMap = await getCurrenciesMap()
-    console.log(currenciesMap)
-    const structuredCurrencies = getStructuredCurrencies(currenciesMap)
+    const currenciesData = await getCurrenciesData()
+    console.log(currenciesData)
+    const structuredCurrencies = getStructuredCurrencies(currenciesData)
     console.log(structuredCurrencies)
     // const sentCurrencies = await sendCurrencies()
   } catch (error) {
