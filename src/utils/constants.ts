@@ -10,7 +10,7 @@ export const GlobalEnv = {
 
 export const CRON_INTERVALS = {
   EVERY_TEN_SECONDS: '*/10 * * * * *',
-  EVERYDAY_AT_MIDNIGHT: '* * * * * *'
+  EVERY_DAY_AT_MIDNIGHT: '0 0 * * * *'
 }
 
 export const CURRENCY_PATHS: { [key: string]: string } = {
