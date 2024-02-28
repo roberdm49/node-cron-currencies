@@ -6,3 +6,10 @@ export interface CurrencyData {
   venta: number
   fechaActualizacion: string
 }
+
+export interface ApiExpectedCurrencyStructure {
+  name: string
+  isoCode: string
+  isoNum: string
+  valueInUsd: number
+}

@@ -1,2 +1,1 @@
-export * from './ApiExpectedCurrencyStructure'
-export * from './CurrencyData'
+export * from './currency'

@@ -8,6 +8,11 @@ export const GlobalEnv = {
   INTERNAL_CURRENCY_API_URL: String(process.env.INTERNAL_CURRENCY_API_URL)
 } as const
 
+export const CRON_INTERVALS = {
+  EVERY_TEN_SECONDS: '*/10 * * * * *',
+  EVERYDAY_AT_MIDNIGHT: '* * * * * *'
+}
+
 export const CURRENCY_PATHS: { [key: string]: string } = {
   USD: 'dolares/blue',
   EUR: 'cotizaciones/eur',
