@@ -1,25 +1,10 @@
 import { CronJob } from 'cron'
 import axios, { AxiosResponse } from 'axios'
-import { CURRENCY_PATHS, GlobalEnv, ISO_NUMS } from './utils/constants'
 import Big from 'big.js'
+import { GlobalEnv, CURRENCY_PATHS, ISO_NUMS } from './utils/constants'
+import { ApiExpectedCurrencyStructure, CurrencyData } from './types'
 
 console.log('executing index')
-
-interface CurrencyData {
-  moneda: string
-  casa: string
-  nombre: string
-  compra: number
-  venta: number
-  fechaActualizacion: string
-}
-
-interface ApiExpectedCurrencyStructure {
-  name: string
-  isoCode: string
-  isoNum: string
-  valueInUsd: number
-}
 
 const getCurrenciesData = async (): Promise<CurrencyData[]> => {
   const currencyPromises = []
@@ -97,33 +82,9 @@ const sendCurrencies = async (payload: ApiExpectedCurrencyStructure[]): Promise<
 
 const executeCurrencyTask = async (): Promise<void> => {
   try {
-    /*
     const currenciesData = await getCurrenciesData()
-    console.log(currenciesData)
     const structuredCurrencies = getStructuredCurrencies(currenciesData)
-    console.log(structuredCurrencies)
-    */
-    const payload = [
-      {
-        name: 'Euro',
-        isoCode: 'EUR',
-        isoNum: '978',
-        valueInUsd: 0.8603696682464455
-      },
-      {
-        name: 'Real Brasileño',
-        isoCode: 'BRL',
-        isoNum: '986',
-        valueInUsd: 0.1591563981042654
-      },
-      {
-        name: 'Pesos argentinos',
-        isoCode: 'ARS',
-        isoNum: '032',
-        valueInUsd: 0.0009478672985781991
-      }
-    ]
-    const sentCurrencies = await sendCurrencies(payload)
+    const sentCurrencies = await sendCurrencies(structuredCurrencies)
     console.log({ sentCurrencies })
   } catch (error) {
     console.log(error)
@@ -131,10 +92,12 @@ const executeCurrencyTask = async (): Promise<void> => {
 }
 
 const job = new CronJob('*/10 * * * * *', async () => {
-  const newDate = new Date()
-  console.log(`Job @ ${newDate.toString()}`)
-  // await executeCurrencyTask()
+  try {
+    await executeCurrencyTask()
+  } catch (error) {
+    console.log('Unexpected error on CronJob')
+    console.log(error)
+  }
 })
 
 job.start()
-executeCurrencyTask().then(res => console.log(res)).catch(error => console.log(error))
