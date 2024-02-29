@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 dotenv.config()
 
 export const GlobalEnv = {
-  NODE_ENV: String(process.env.NODE_ENV),
+  APP_RUNTIME_ENV: String(process.env.APP_RUNTIME_ENV),
   CRON_SECRET: String(process.env.CRON_SECRET),
   EXTERNAL_CURRENCY_API_BASE_URL: String(process.env.EXTERNAL_CURRENCY_API_BASE_URL),
   INTERNAL_CURRENCY_API_URL: String(process.env.INTERNAL_CURRENCY_API_URL)

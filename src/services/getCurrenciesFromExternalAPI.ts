@@ -6,7 +6,7 @@ import { CurrencyData } from '@/types'
 import { CURRENCY_PATHS, GlobalEnv } from '@/utils/constants'
 
 export const getCurrenciesFromExternalAPI = async (): Promise<CurrencyData[]> => {
-  if (GlobalEnv.NODE_ENV === 'development') {
+  if (GlobalEnv.APP_RUNTIME_ENV === 'development') {
     return await getDataFromMock()
   }
 
