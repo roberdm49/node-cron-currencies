@@ -1,0 +1,26 @@
+[
+  {
+    "moneda": "USD",
+    "casa": "blue",
+    "nombre": "Blue",
+    "compra": 1025,
+    "venta": 1045,
+    "fechaActualizacion": "2024-02-29T12:54:00.000Z"
+  },
+  {
+    "moneda": "EUR",
+    "casa": "oficial",
+    "nombre": "Euro",
+    "compra": 911.98,
+    "venta": 912.43,
+    "fechaActualizacion": "2024-02-29T12:54:00.000Z"
+  },
+  {
+    "moneda": "BRL",
+    "casa": "oficial",
+    "nombre": "Real Brasileño",
+    "compra": 169.41,
+    "venta": 169.46,
+    "fechaActualizacion": "2024-02-29T12:54:00.000Z"
+  }
+]
