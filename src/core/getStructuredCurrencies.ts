@@ -1,8 +1,8 @@
 import Big from 'big.js'
-import { ApiExpectedCurrencyStructure, CurrencyData } from '@/types'
+import { ApiExpectedCurrencyStructureToSend, CurrencyData } from '@/types'
 import { ISO_NUMS } from '@/utils/constants'
 
-export const getStructuredCurrencies = (currenciesData: CurrencyData[]): ApiExpectedCurrencyStructure[] => {
+export const getStructuredCurrencies = (currenciesData: CurrencyData[]): ApiExpectedCurrencyStructureToSend[] => {
   let usdReferenceValue = null
   const rawCurrencies = []
   const structuredCurrencies = []
@@ -25,7 +25,7 @@ export const getStructuredCurrencies = (currenciesData: CurrencyData[]): ApiExpe
     const currentCurrencyValue = new Big(rawCurrency.compra)
     const normalizedCurrentCurrencyValue = currentCurrencyValue.div(usdReferenceValue).toNumber()
 
-    const currency: ApiExpectedCurrencyStructure = {
+    const currency: ApiExpectedCurrencyStructureToSend = {
       name: rawCurrency.nombre,
       isoCode: rawCurrency.moneda,
       isoNum: ISO_NUMS[rawCurrency.moneda],
@@ -38,7 +38,7 @@ export const getStructuredCurrencies = (currenciesData: CurrencyData[]): ApiExpe
   // particular case, has to be done manually
   const arsCurrencyValue = new Big(1)
   const normalizedArsCurrencyValue = arsCurrencyValue.div(usdReferenceValue).toNumber()
-  const ars: ApiExpectedCurrencyStructure = {
+  const ars: ApiExpectedCurrencyStructureToSend = {
     name: 'Pesos argentinos',
     isoCode: 'ARS',
     isoNum: ISO_NUMS.ARS,

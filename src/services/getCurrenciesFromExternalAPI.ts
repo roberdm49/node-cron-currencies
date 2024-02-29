@@ -14,7 +14,7 @@ export const getCurrenciesFromExternalAPI = async (): Promise<CurrencyData[]> =>
 }
 
 const getDataFromMock = async (): Promise<CurrencyData[]> => {
-  console.log(chalk.yellowBright('Retrieving data from mock'))
+  console.log(chalk.blueBright('Retrieving data from mock'))
 
   const mockFilePath = path.join(__dirname, '../mock/currenciesFromExternalApi.json')
   const mockData = fs.readFileSync(mockFilePath, 'utf8')

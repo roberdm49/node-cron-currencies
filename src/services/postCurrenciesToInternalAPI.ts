@@ -1,13 +1,20 @@
-import axios, { AxiosResponse } from 'axios'
-import { ApiExpectedCurrencyStructure } from '@/types'
+import axios from 'axios'
+import { ApiExpectedCurrencyStructureToReceive, ApiExpectedCurrencyStructureToSend } from '@/types'
 import { GlobalEnv } from '@/utils/constants'
 
-export const postCurrenciesToInternalAPI = async (payload: ApiExpectedCurrencyStructure[]): Promise<AxiosResponse> => {
+interface InternalApiDataResponse {
+  updatedCurrencies: ApiExpectedCurrencyStructureToReceive[]
+}
+
+export const postCurrenciesToInternalAPI = async (payload: ApiExpectedCurrencyStructureToSend[]): Promise<ApiExpectedCurrencyStructureToReceive[]> => {
   const requestConfig = {
     headers: {
       Authorization: `Bearer ${GlobalEnv.CRON_SECRET}`
     }
   }
 
-  return await axios.post(GlobalEnv.INTERNAL_CURRENCY_API_URL, payload, requestConfig)
+  const response = await axios.post<InternalApiDataResponse>(GlobalEnv.INTERNAL_CURRENCY_API_URL, payload, requestConfig)
+
+  const { updatedCurrencies } = response.data
+  return updatedCurrencies
 }
