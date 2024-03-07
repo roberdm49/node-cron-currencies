@@ -5,8 +5,6 @@ export const getClassifiedCurrencyResponse = (
   responseData: ApiExpectedCurrencyStructureToReceive[]
 ): ClassifiedCurrencies => {
   const targetObj: { [key: string]: boolean } = {}
-  console.log({ sentData })
-  console.log({ responseData })
 
   const matchedCurrencies: string[] = []
   const nonMatchedCurrencies: string[] = []
